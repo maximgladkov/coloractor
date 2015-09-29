@@ -9,4 +9,6 @@ Gem::Specification.new do |s|
   s.files       = ["lib/colorator.rb"]
   s.homepage    =  'http://rubygems.org/gems/colorator'
   s.license     = 'MIT'
+
+  s.add_development_dependency 'rspec'
 end
