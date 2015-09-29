@@ -10,5 +10,8 @@ Gem::Specification.new do |s|
   s.homepage    =  'http://rubygems.org/gems/colorator'
   s.license     = 'MIT'
 
+	s.add_dependency 'rubypython'
+	s.add_dependency 'color'
+
   s.add_development_dependency 'rspec'
 end
