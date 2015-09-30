@@ -7,13 +7,13 @@ describe Coloractor do
 
   it "extracts dominant colors from image file" do
     result = do_extract
-    expected_colors = ['#d5ddb6', '#bd8d67', '#655242']  
+    expected_colors = ["#B7CF8F", "#E6F8C9", "#F5FEEB", "#F29753", "#957052"]
     expect(result.dominant_colors).to eq(expected_colors)
   end
 
   it "extracts background color from image file" do 
     result = do_extract
-    background_color = '#97c24e'
+    background_color = '#96C14E'
     expect(result.background_color).to eq(background_color)
   end
 
