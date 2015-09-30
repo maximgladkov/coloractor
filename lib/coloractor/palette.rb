@@ -3,12 +3,11 @@ require 'mini_magick'
 
 class Coloractor::Palette
 
-  N_QUANTIZED = 100
-  MIN_DISTANCE = 10.0
+  N_QUANTIZED    = 100
+  MIN_DISTANCE   = 10.0
   MIN_SATURATION = 0.05
   MIN_PROMINENCE = 0.01
-  MAX_COLORS = 5
-  # BACKGROUND_PROMINENCE = 0.5
+  MAX_COLORS     = 5
 
   def self.build_from_file(filename)
     image = open_image(filename)
@@ -18,16 +17,16 @@ class Coloractor::Palette
     end
 
     image = trim_image(image)
+    image = resize_image(image)
     image = reduce_colors_in_image(image, N_QUANTIZED)
-    pixels = get_pixels_from_image(image)
-    pixels_count = pixels.size
 
     canonical_colors  = { '#FFFFFFFF' => '#FFFFFFFF', '#000000FF' => '#000000FF' }
     aggregated_colors = { '#FFFFFFFF' => 0, '#000000FF' => 0 }
     
-    grouped_pixels = Hash[ *pixels.group_by{ |i| i }.map{|k,v| [k, v.count] }.flatten ]
+    grouped_pixels = get_pixels_from_image(image)
+    pixels_count = grouped_pixels.values.reduce(:+)
+
     sorted_pixels = grouped_pixels.sort_by{ |color, count| -count }
-    
     sorted_pixels.each do |(color, count)|
       if aggregated_colors.include?(color)
         aggregated_colors[color] += count
@@ -45,7 +44,7 @@ class Coloractor::Palette
     end
 
     sorted_aggregated_colors = aggregated_colors.sort_by{ |color, count| -count }
-    background_color = detect_background_color(image, pixels, sorted_aggregated_colors, canonical_colors)
+    background_color = detect_background_color(image, sorted_aggregated_colors, canonical_colors)
     
     colors = sorted_aggregated_colors.map{ |(color, count)| color }.select{ |c| background_color.nil? || c != background_color }
     
@@ -86,7 +85,7 @@ class Coloractor::Palette
   end
 
   def self.image_mode_is_rgb?(image)
-    true # image.colorspace =~ /rgb/i
+    image['colorspace'] =~ /rgb/i
   end
 
   def self.convert_image_mode_to_rgb(image)
@@ -97,13 +96,17 @@ class Coloractor::Palette
     image.tap(&:trim)
   end
 
+  def self.resize_image(image)
+    image.tap{ |i| i.resize '600x600\>' }
+  end
+
   def self.reduce_colors_in_image(image, max_colors)
     image.tap{ |i| i.combine_options{ |o| o.dither 'None'; o.colors max_colors } }
   end
 
   def self.get_pixels_from_image(image)
-    output = `convert -dither None -colors 100 #{ image.path } txt:-`
-    output.scan(/#[0-9a-fA-F]{6,8}/).flatten.map{ |color| color }
+    output = `convert #{ image.path } -dither None -colors 100 -define histogram:unique-colors=true -format %c histogram:info:`
+    grouped_pixels = Hash[ *output.scan(/(\d+?):.+(#[0-9a-fA-F]{6,8})/).map{ |a, b| [b, a.to_i] }.flatten ]
   end
 
   def self.find_closest_color(color, colors)
@@ -124,8 +127,9 @@ class Coloractor::Palette
     color.size > 7 ? color[7..8].to_i(16) : 255
   end
 
-  def self.detect_background_color(image, pixels, colors, canonical_colors)
-    # TODO: remove this if not needed
+  def self.detect_background_color(image, colors, canonical_colors)
+    # We want to remove background color based on key points only. Some logos might be solid color based and they are treated as background then.
+    # TODO: remove commented code if it is not needed anymore
     # if colors.first && calculate_prominence(colors.first.first, colors, pixels.size) >= BACKGROUND_PROMINENCE
     #   return colors.first.first
     # end
@@ -142,7 +146,7 @@ class Coloractor::Palette
       [width / 2, 0]
     ]
 
-    edge_pixels = points.map{ |(left, top)| pixels[top * width + left] }
+    edge_pixels = points.map{ |(left, top)| get_image_pixel_color(image, left, top) }
     grouped_edge_pixels = Hash[ *edge_pixels.group_by{|i| i}.map{|k,v| [k, v.count] }.flatten ]
     sorted_pixels = grouped_edge_pixels.sort_by{ |color, count| count }.reverse
     majority_color, majority_count = sorted_pixels.first
@@ -155,6 +159,13 @@ class Coloractor::Palette
 
   def self.get_image_size(image)
     image['dimensions']
+  end
+
+  def self.get_image_pixel_color(image, left, top)
+    image.run_command("convert", "#{image.path}[1x1+#{left.to_i}+#{top.to_i}]", 'txt:').split("\n").each do |line|
+      return $1 if /^0,0:.*(#[0-9a-fA-F]+)/.match(line)
+    end
+    nil
   end
 
   def self.calculate_prominence(color, colors, pixels_count)
