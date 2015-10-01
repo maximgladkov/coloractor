@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "A simple ruby wrapper around colorific Python script."
   s.authors     = ["Maxim Gladkov"]
   s.email       = 'contact@maximgladkov.com'
-  s.files       = ["lib/colorator.rb"]
+  s.files       = ["lib/coloractor.rb", "lib/coloractor/palette.rb"]
   s.homepage    =  'http://rubygems.org/gems/colorator'
   s.license     = 'MIT'
 
