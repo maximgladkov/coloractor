@@ -97,7 +97,7 @@ class Coloractor::Palette
   end
 
   def self.resize_image(image)
-    image.tap{ |i| i.resize '600x600\>' }
+    image.tap{ |i| i.resize '600x>' }
   end
 
   def self.reduce_colors_in_image(image, max_colors)
