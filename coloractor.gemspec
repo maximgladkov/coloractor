@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'coloractor'
-  s.version     = '0.0.2'
+  s.version     = '0.0.3'
   s.date        = '2015-09-29'
   s.summary     = "Dominant colors extractor from an image file"
   s.description = "A simple ruby wrapper around colorific Python script."
