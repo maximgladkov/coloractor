@@ -1,17 +1,16 @@
 PATH
   remote: .
   specs:
-    coloractor (0.0.1)
+    coloractor (0.0.2)
       color
       mini_magick
 
 GEM
   remote: https://rubygems.org/
   specs:
-    color (1.7.1)
+    color (1.8)
     diff-lcs (1.2.5)
-    mini_magick (3.8.1)
-      subexec (~> 0.2.1)
+    mini_magick (4.3.6)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)
       rspec-expectations (~> 3.3.0)
@@ -25,7 +24,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
-    subexec (0.2.3)
 
 PLATFORMS
   ruby
@@ -35,4 +33,4 @@ DEPENDENCIES
   rspec
 
 BUNDLED WITH
-   1.10.5
+   1.10.6

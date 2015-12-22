@@ -101,7 +101,7 @@ class Coloractor::Palette
   end
 
   def self.reduce_colors_in_image(image, max_colors)
-    image.tap{ |i| i.combine_options{ |o| o.dither 'None'; o.colors max_colors } }
+    image.tap{ |i| i.combine_options{ |o| o.dither 'None'; o.colors max_colors; o.repage.+ } }
   end
 
   def self.get_pixels_from_image(image)

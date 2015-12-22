@@ -7,7 +7,7 @@ describe Coloractor do
 
   it "extracts dominant colors" do
     result = do_extract
-    expected_colors = ["#FBCB44", "#FAE8A8", "#FEF8D5", "#C7E8FA"]
+    expected_colors = ["#FBCB44", "#FEF6C8", "#AFD6EB", "#EBD887", "#F9F9EA"] 
     expect(result.dominant_colors).to eq(expected_colors)
   end
 
